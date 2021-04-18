@@ -1,0 +1,192 @@
+MAP
+NAME "Thailand"
+IMAGECOLOR 255 255 255
+SIZE 600 800
+IMAGETYPE PNG24
+PROJECTION
+	"init=epsg:4326" #latlon on WGS84
+END #default projection
+EXTENT 97.3 5.6 105.7 20.5 # lon/lat extents of Thailand
+WEB
+	METADATA
+		"ows_enable_request" "*"
+		"map" "d:/iishome/student/s2434970/thailand/configWMS.map"
+		"ows_schemas_location" "http://schemas.opengeospatial.net"
+		"ows_title" "ThailandWMS"
+		"ows_onlineresource" "https://gisedu.itc.utwente.nl/cgi-bin/mapserv.exe?map=d:/iishome/student/s2434970/thailand/configWMS.map&"
+		"ows_srs" "EPSG:4326 EPSG:3857" #latlon
+		"wms_feature_info_mime_type" "text/plain"
+		"wms_feature_info_mime_type" "text/html"
+		"wms_server_version" "1.3.0"
+		"wms_formatlist" "image/png,image/gif,image/jpeg"
+		"wms_format" "image/png"
+	END #web metadata
+END #web
+
+LAYER
+	NAME "forest"
+	TOLERANCE 5
+  TOLERANCEUNITS pixels
+	TYPE POLYGON
+	STATUS ON
+	CONNECTIONTYPE postgis
+	CONNECTION "user=exercises password=exercises dbname=exercises host=gisedu.itc.utwente.nl port=5432 options='-c client_encoding=UTF8'"
+	DATA "geom FROM thailand.forest USING UNIQUE id USING srid=4326"
+	METADATA
+		"ows_title" "forest"
+		"ows_extent" "97.3 5.6 105.7 20.5"
+		"wms_include_items" "all"
+	END #layer metadata
+	PROJECTION
+		"init=epsg:4326"
+	END #layer projection
+  CLASSITEM "for_type"
+      CLASS
+          NAME "Forest Reserve"
+          EXPRESSION "FR" #if for_type=FR
+          COLOR 100 168 0
+					TEMPLATE "empty"
+      END #class FR
+      CLASS
+          NAME "National Park"
+          EXPRESSION "NP" #if for_type=NP
+          COLOR 171 205 102
+      END #class NP
+      CLASS
+          NAME "Wildlife Sanctuary"
+          EXPRESSION "WS" #if for_type=WS
+          COLOR 245 245 122
+      END #class WS
+      CLASS
+          NAME "Not forest"
+          EXPRESSION "NF" #if for_type=NF
+          COLOR 200 200 200
+      END #class NF
+END #layer forest
+
+LAYER
+    NAME railroad
+		TOLERANCE 5
+    TOLERANCEUNITS pixels
+    TYPE LINE
+    STATUS ON
+    CONNECTIONTYPE postgis
+    CONNECTION "user=exercises password=exercises dbname=exercises host=gisedu.itc.utwente.nl port=5432 options='-c client_encoding=UTF8'"
+    DATA "geom FROM thailand.railroad USING UNIQUE id USING srid=4326"
+    METADATA
+      "ows_title" "railroad"
+      "ows_extent" "97.3 5.6 105.7 20.5"
+			"wms_include_items" "all"
+    END
+    PROJECTION
+     "init=epsg:4326"
+    END
+    CLASS
+      NAME "railroad"
+			TEMPLATE "empty"
+      STYLE
+        COLOR 255 0 0
+        WIDTH 2
+      END #style
+    END #class
+END #layer railroad
+
+SYMBOL
+   NAME "circle_sym"
+   TYPE ellipse
+   FILLED true
+    POINTS
+      1 1
+    END
+END #symbol
+
+FONTSET  "fonts/fonts.list"
+
+SYMBOL
+    NAME "airport_sym"
+    TYPE TRUETYPE
+    FONT "ESRI_Default_Marker"
+    FILLED true
+    ANTIALIAS true
+    CHARACTER "o"
+END #symbol
+
+LAYER
+    NAME "airports"
+		TOLERANCE 5
+    TOLERANCEUNITS pixels
+    TYPE POINT
+    STATUS ON
+    CONNECTIONTYPE postgis
+      CONNECTION "user=exercises password=exercises dbname=exercises host=gisedu.itc.utwente.nl port=5432 options='-c client_encoding=UTF8'"
+      DATA "geom FROM thailand.airports USING UNIQUE id USING srid=4326"
+    METADATA
+      "ows_title" "airports"
+      "ows_extent" "97.3 5.6 105.7 20.5"
+			"wms_include_items" "all"
+    END
+    PROJECTION
+      "init=epsg:4326"
+    END
+
+    #attribute to use for labels:
+    LABELITEM "name"
+
+    CLASS
+      NAME "airports"
+			TEMPLATE "empty"
+      STYLE
+        SYMBOL "airport_sym"
+        SIZE 20
+        COLOR 0 0 0
+      END #style
+
+      LABEL
+          COLOR 0 0 0
+          TYPE TRUETYPE
+          FONT "arial"
+          MINSIZE 5
+          MAXSIZE 8
+          POSITION AUTO
+          PARTIALS FALSE
+          BUFFER 2
+        END  #label
+
+    END #class
+END #layer airports
+
+LAYER
+  NAME "natural_earth"
+  DATA "data/naturalearth.tif"
+  TYPE RASTER
+  STATUS ON
+  MINSCALE 100000
+
+  METADATA
+      "ows_title" "naturalearth"
+  END
+  PROJECTION
+     "init=epsg:4326"
+  END
+
+    # this sets the opacity to 40%
+    # (equals a transparency of 60%)
+  OPACITY 30
+
+
+
+END
+
+LEGEND
+    KEYSIZE 16 12
+    LABEL
+        COLOR 0 0 0
+        TYPE TRUETYPE
+        FONT "arial"
+        SIZE 10
+    END #label
+    STATUS ON
+    POSITION LR
+END #legend
+
+END #map
